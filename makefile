@@ -7,6 +7,17 @@ all:
 		mkdir -p build; \
 		cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug; fi
 	@make -C build
+	
+map=maps/level$(LVL)/level$(LVL)-$(NUM).txt
+
+run:
+	@../QtOvercooked/QtOvercooked.exe -l $(map) -p build/main.exe
+
+fast:
+	@../QtOvercooked/runner.exe -l $(map) -p build/main.exe
+
+play:
+	@../QtOvercooked/QtOvercooked.exe -l $(map)
 
 clean:
 	@if [[ -d build ]]; then \
