@@ -89,7 +89,6 @@ int main()
     std::string s;
     std::stringstream ss;
     int frame;
-
     init_read();
 
     /*
@@ -108,27 +107,24 @@ int main()
         if (skip) continue;
         std::string player0_Action="Move";
         std::string player1_Action = "Move";
+
+
+
     //行为策略
     //player0负责做菜及上菜
     //检查当前食谱上的原料
     //fix原料位置
     //取原料
     //拿盘子
-    //std::cerr<<"step0 into"<<std::endl;
     if(finished){
         finished=0;
         current_ingredient=Order[0].recipe[count1];
-        //std::cerr<<Order[0].recipe[count1]<<std::endl;
     }
-     //std::cerr<<"step0 into"<<std::endl;
     if(status==0){//取食材
-        //std::cerr<<"step1 into"<<std::endl;
         for (int i = 0; i < IngredientCount; i++)
             {
-                //std::cerr<<"step2 into"<<std::endl;
                 if (Ingredient[i].name == current_ingredient)
                 {   
-                    //std::cerr<<"step3 into"<<std::endl;
                     o0_x=Ingredient[i].x;
                     o0_y=Ingredient[i].y;
                     fix(&des_x,&des_y,Ingredient[i].x,Ingredient[i].y);
@@ -139,33 +135,24 @@ int main()
             player0_Action=movement(des_x,des_y,0);//移动操作
         }
         else{
-            if(o0_x==0){
-                player0_Action="PutOrPick L";
-            }
-            else if(o0_x==9){
-                player0_Action="PutOrPick R";
-            }
-            else if(o0_y==0){
-                player0_Action="PutOrPick U";
-            }
-            else if(o0_y==9){
-                player0_Action="PutOrPick D";
-            }
-            else{
-                std::cerr<<"No match"<<std::endl;
-            }
+            player0_Action=inte(o0_x,o0_y,1);
             status=1;//去取盘子
         }//取食材操作
     }
     else if(status==1){//取盘子
         bool find_plate=0;
-        if(plate_x==-1)
-        for(int i=0;i<entityCount;i++){
-            if(Entity[i].containerKind==ContainerKind::Plate){
-                plate_x=Entity[i].x;
-                plate_y=Entity[i].y;
-                find_plate=1;
-                break;
+        if(plate_x==-1){
+            for(int i=0;i<entityCount;i++){
+                if(Entity[i].containerKind==ContainerKind::Plate){
+                    plate_x=Entity[i].x;
+                    plate_y=Entity[i].y;
+                    find_plate=1;
+                    break;
+                }
+            }
+            if(!find_plate){
+                //fix(&des_x,&des_y,sink_x,sink_y);
+                //player0_Action=movement(sink_x,sink_y,0);//移动操作
             }
         }
         else find_plate=1;
@@ -175,32 +162,14 @@ int main()
                 player0_Action=movement(des_x,des_y,0);//移动操作
             }
             else {
-                if(plate_x==0){
-                    player0_Action="PutOrPick L";
-                    derection="L";
-                }
-                else if(plate_x==9){
-                    player0_Action="PutOrPick R";
-                    derection="R";
-                }
-                else if(plate_y==0){
-                    player0_Action="PutOrPick U";
-                    derection="U";
-                }
-                else if(plate_y==9){
-                    player0_Action="PutOrPick D";
-                    derection="D";
-                }
-                else{
-                    std::cerr<<"No match"<<std::endl;
-                }
+                player0_Action=inte(plate_x,plate_y,1);
                 count1++;
                 if(count1==Order[0].recipe.size())status=2;//拿盘子和食材 
             }
         }
     }
     else if(status==2){//拿起做好的食材
-        player0_Action="PutOrPick "+derection;
+        player0_Action=inte(plate_x,plate_y,1);
         plate_x=-1;
         plate_y=-1;
         status=3;
@@ -211,23 +180,15 @@ int main()
                 player0_Action=movement(des_x,des_y,0);//移动操作
             }
         else {
-            if(windows_x==0){
-                player0_Action="PutOrPick L";
-            }
-            else if(windows_x==9){
-                player0_Action="PutOrPick R";
-            }
-            else if(windows_y==0){
-                player0_Action="PutOrPick U";
-            }
-            else if(windows_y==9){
-                player0_Action="PutOrPick D";
-            }
+            player0_Action=inte(windows_x,windows_y,1);
             finished=1;
             status=0; 
             count1=0;
         }
     }
+
+
+
     //player1负责拿脏盘子以及洗盘子
     if(Players[1].containerKind==ContainerKind::DirtyPlates){//player1拿着脏盘子去洗碗池
         fix(&des1_x,&des1_y,sink_x,sink_y);
@@ -235,28 +196,13 @@ int main()
             player1_Action=movement(des1_x,des1_y,1);//移动操作
         }
         else{
-            if(sink_x==0){
-                player1_Action="PutOrPick L";
-                derection1="L";
-            }
-            else if(sink_x==9){
-                player1_Action="PutOrPick R";
-                derection1="R";
-            }
-            else if(sink_y==0){
-                player1_Action="PutOrPick U";
-                derection1="U";
-            }
-            else if(sink_y==9){
-                player1_Action="PutOrPick D";
-                derection1="D";
-            }
+            player1_Action=inte(sink_x,sink_y,1);
             washing=1;
         }
     }
     else{
         if(washing){
-            player1_Action="Interact "+derection1;
+            player1_Action=inte(sink_x,sink_y,2);
             int check=0;
             for(int i=0;i<entityCount;i++){
                 if (Entity[i].containerKind == ContainerKind::DirtyPlates)
@@ -290,18 +236,7 @@ int main()
                     player1_Action=movement(des1_x,des1_y,1);//移动操作
                 }
                 else{
-                    if(o1_x==0){
-                        player1_Action="PutOrPick L";
-                    }
-                    else if(o1_x==9){
-                        player1_Action="PutOrPick R";
-                    }
-                    else if(o1_y==0){
-                        player1_Action="PutOrPick U";
-                    }
-                    else if(o1_y==9){
-                        player1_Action="PutOrPick D";
-                    }
+                    player1_Action=inte(o1_x,o1_y,1);
                 }
             }
         }

@@ -39,67 +39,44 @@ bool in(double x,double y,double d_x,double d_y){
     return 0;
 }//检查是否抵达目的地
 
-string inte(double d_x, double d_y, int id, int op){
-    if(8.99<d_y && d_y<9.01 &&(d_y - Players[id].y <= center + 0.3) && (Players[id].x >= d_x && (Players[id].x - d_x) <= center + radius)){
-        if(op==1){
-            return "PutOrPick D";
+string inte(double d_x, double d_y,  int op){
+    if(d_x==0){
+            if(op==1){
+                return "PutOrPick L";
+            }
+            else if(op==2){
+                return "Interact L";
+            }
         }
-        else if(op==2){
-            return "Interact D";
+    else if(d_x==9){
+            if(op==1){
+                return "PutOrPick R";
+            }
+            else if(op==2){
+                return "Interact R";
+            }
         }
-    }
-    else if(d_y == 0 && (Players[id].y - d_y <=  + center + 1.3) && (Players[id].x >= d_x && (Players[id].x - d_x) <= center + radius)){
-         if(op==1){
-            return "PutOrPick U";
+    else if(d_y==0){
+            if(op==1){
+                return "PutOrPick U";
+            }
+            else if(op==2){
+                return "Interact U";
+            }
         }
-        else if(op==2){
-            return "Interact U";
+    else if(d_y==9){
+            if(op==1){
+                return "PutOrPick D";
+            }
+            else if(op==2){
+                return "Interact D";
+            }
         }
-    }
-     else if(d_x == 0 && (Players[id].x - d_x <= center + 1.3) && (Players[id].y >= d_y && (Players[id].y - d_y) <= center + radius)){
-         if(op==1){
-            return "PutOrPick L";
-        }
-        else if(op==2){
-            return "Interact L";
-        }
-    }
+    else assert(0);    
 }
 
 
 string movement(double d_x,double d_y,int id){
-    /*
-    if(Players[id].X_Velocity==0 &&Players[id].Y_Velocity==0 && Players[id].x - center <= d_x + 0.3
-    && Players[id].x >= d_x && Players[id].y - center <= d_y + 0.3 && Players[id].y >= d_y){
-        //return inte(d_x,d_y,id,op);
-    }
-
-
-     if(8.99<d_y && d_y<9.01 &&(d_y - Players[id].y <= center + 0.3) && (Players[id].x >= d_x && (Players[id].x - d_x) <= center + radius)){
-        if(op==1){
-            return "PutOrPick D";
-        }
-        else if(op==2){
-            return "Interact D";
-        }
-    }
-    else if(d_y == 0 && (Players[id].y - d_y <=  + center + 1.3) && (Players[id].x >= d_x && (Players[id].x - d_x) <= center + radius)){
-         if(op==1){
-            return "PutOrPick U";
-        }
-        else if(op==2){
-            return "Interact U";
-        }
-    }
-     else if(d_x == 0 && (Players[id].x - d_x <= center + 1.3) && (Players[id].y >= d_y && (Players[id].y - d_y) <= center + radius)){
-         if(op==1){
-            return "PutOrPick L";
-        }
-        else if(op==2){
-            return "Interact L";
-        }
-    }*/
-
     string ret = "Move ";
     if (Players[id].x < d_x + error_d)
         ret += "R";
