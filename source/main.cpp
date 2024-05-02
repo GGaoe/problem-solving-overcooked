@@ -47,6 +47,11 @@ double o1_y=0;
 double des1_x=0;
 double des1_y=0;
 bool washing=0;
+double clean_plate_x=0;
+double clean_plate_y=0;
+double dirty_plate_x=0;
+double dirty_plate_y=0;
+
 
 void init(){
     status=0;
@@ -67,6 +72,14 @@ void init(){
             else if(Map[i][j]=='c'){
                 cut_x=j;
                 cut_y=i;
+            }
+            else if(Map[i][j]=='r'){
+                clean_plate_x=j;
+                clean_plate_y=i;
+            }
+            else if(Map[i][j]=='p'){
+                dirty_plate_x=j;
+                dirty_plate_y=i;
             }
         }
     }
@@ -151,8 +164,10 @@ int main()
                 }
             }
             if(!find_plate){
-                //fix(&des_x,&des_y,sink_x,sink_y);
-                //player0_Action=movement(sink_x,sink_y,0);//移动操作
+                fix(&des_x,&des_y,clean_plate_x,clean_plate_y);
+                if(!in(des_x,des_y,Players[0].x,Players[0].y)){
+                    player0_Action=movement(des_x,des_y,0);//提前移动到干净盘子的地方//优化后比没优化还低？
+                }
             }
         }
         else find_plate=1;
@@ -164,7 +179,7 @@ int main()
             else {
                 player0_Action=inte(plate_x,plate_y,1);
                 count1++;
-                if(count1==Order[0].recipe.size())status=2;//拿盘子和食材 
+                if(count1==Order[0].recipe.size())status=2;//已经完成菜谱，去拿盘子和食材 
             }
         }
     }
@@ -229,7 +244,10 @@ int main()
                 }
             }
             if(!check){
-            
+                fix(&des1_x,&des1_y,dirty_plate_x,dirty_plate_y);
+                if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
+                    //player1_Action=movement(des1_x,des1_y,1);//移动操作
+                }
             }
             else{
                 if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
