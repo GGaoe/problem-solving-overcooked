@@ -4,6 +4,11 @@
 #include <string>
 #include <vector>
 #include <enum.h>
+#include <move.h>
+
+const double radius=0.35;
+const double max_interact=1.3;
+const double center=0.5;
 
 struct Ingredient
 {
@@ -31,7 +36,7 @@ struct Player
     double x, y;
     double X_Velocity;
     double Y_Velocity;
-    int live;
+    int live; 
     ContainerKind containerKind;
     std::vector<std::string> entity;
 };

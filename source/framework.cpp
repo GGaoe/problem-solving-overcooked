@@ -7,9 +7,11 @@
 #include <cassert>
 #include <vector>
 #include <string>
+#include <move.h>
 
 /* 按照读入顺序定义 */
 int width, height;
+int status;
 char Map[20 + 5][20 + 5];
 int IngredientCount;
 struct Ingredient Ingredient[20 + 5];
@@ -138,29 +140,18 @@ bool frame_read(int nowFrame)
         Players[i].entity.clear();
         while (tmp >> s)
         {
-            /*
-                若若该玩家手里有东西，则接下来一个分号，分号后一个空格，空格后为一个实体。
-                以下是可能的输入（省略前面的输入）：
-                 ;  : fish
-                 ; @  : fish
-                 ; @ Plate : fish
-                 ; Plate
-                 ; DirtyPlates 1
-                ...
-            */
-
-            /* 若你不需要处理这些，可直接忽略 */
             if (s == ";" || s == ":" || s == "@" || s == "*")
                 continue;
 
-            /* 
-                Todo: 其他容器
-            */
             if (s == "Plate")
                 Players[i].containerKind = ContainerKind::Plate;
             else if (s == "DirtyPlates")
                 Players[i].containerKind = ContainerKind::DirtyPlates;
-            else
+            else if (s == "Pot")
+                Players[i].containerKind = ContainerKind::Pot;
+            else if (s == "Pan")
+                Players[i].containerKind = ContainerKind::Pan;
+                else
                 Players[i].entity.push_back(s);
         }
     }
@@ -178,15 +169,6 @@ bool frame_read(int nowFrame)
         Entity[i].sum = 1;
         while (tmp >> s)
         {
-            /*
-                读入一个实体，例子：
-                DirtyPlates 2
-                fish
-                DirtyPlates 1 ; 15 / 180
-
-            */
-
-            /* 若你不需要处理这些，可直接忽略 */
             if (s == ":" || s == "@" || s == "*")
                 continue;
             if (s == ";")
@@ -195,16 +177,21 @@ bool frame_read(int nowFrame)
                 assert(s == "/");
                 break;
             }
-            
-            /* 
-                Todo: 其他容器
-            */
+
             if (s == "Plate")
                 Entity[i].containerKind = ContainerKind::Plate;
             else if (s == "DirtyPlates")
             {
                 Entity[i].containerKind = ContainerKind::DirtyPlates;
                 tmp >> Entity[i].sum;
+            }
+            else if (s == "Pot")
+            {
+                Entity[i].containerKind = ContainerKind::Pot;
+            }
+            else if (s == "Pan")
+            {
+                Entity[i].containerKind = ContainerKind::Pan;
             }
             else
                 Entity[i].entity.push_back(s);

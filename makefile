@@ -11,10 +11,10 @@ all:
 map=maps/level$(LVL)/level$(LVL)-$(NUM).txt
 
 run:
-	@../QtOvercooked/QtOvercooked.exe -l $(map) -p build/main.exe
+	@../QtOvercooked/QtOvercooked.exe -l $(map) -p source/a.exe
 
 fast:
-	@../QtOvercooked/runner.exe -l $(map) -p build/main.exe
+	@../QtOvercooked/runner.exe -l $(map) -p source/a.exe
 
 play:
 	@../QtOvercooked/QtOvercooked.exe -l $(map)
