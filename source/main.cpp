@@ -5,6 +5,8 @@
 #include <string>
 #include <framework.h>
 #include <move.h>
+#include <ctime>
+//#include <stdlib.h>
 
 extern Player Players[2+5];//Player0负责做菜上菜，Player1负责拿脏盘子、洗盘子
 extern int width, height;
@@ -36,22 +38,53 @@ double cliff_y;
 double cut_x;//切菜
 double cut_y;
 std::string current_ingredient="";
-std::string derection="";
-std::string derection1="";
 double des_x=0;
 double des_y=0;
+double des1_x=0;
+double des1_y=0;
 double o0_x=0;
 double o1_x=0;
 double o0_y=0;
 double o1_y=0;
-double des1_x=0;
-double des1_y=0;
 bool washing=0;
 double clean_plate_x=0;
 double clean_plate_y=0;
 double dirty_plate_x=0;
 double dirty_plate_y=0;
 
+std::string random_walk(){
+    //srand((unsigned)time(0));
+    //int ran_num=rand()%4;
+    int ran_num=0;
+    if(ran_num==0)return "Move U";
+    else if(ran_num==1)return "Move D";
+    else if (ran_num==2)return "Move L";
+    else return "Move R";
+    }
+
+bool exist_plate(double *x_1,double *y_1,ContainerKind cont){
+    for(int i=0;i<entityCount;i++){
+                if(Entity[i].containerKind==cont){
+                    *x_1=Entity[i].x;
+                    *y_1=Entity[i].y;
+                    return 1;
+                }
+    }
+    return 0;
+}
+
+bool exist_Ingredient(double *x_1,double *y_1,std::string s){
+   for (int i = 0; i < IngredientCount; i++)
+            {
+                if (Ingredient[i].name == s)
+                {   
+                    *x_1=Ingredient[i].x;
+                    *y_1=Ingredient[i].y;
+                    return 1;
+                }
+            }
+    return 0;
+}
 
 void init(){
     status=0;
@@ -131,19 +164,12 @@ int main()
     //拿盘子
     if(finished){
         finished=0;
-        current_ingredient=Order[0].recipe[count1];
+        count1=0;
+        current_ingredient=Order[0].recipe[0];
     }
     if(status==0){//取食材
-        for (int i = 0; i < IngredientCount; i++)
-            {
-                if (Ingredient[i].name == current_ingredient)
-                {   
-                    o0_x=Ingredient[i].x;
-                    o0_y=Ingredient[i].y;
-                    fix(&des_x,&des_y,Ingredient[i].x,Ingredient[i].y);
-                    break;
-                }
-            }
+        exist_Ingredient(&o0_x,&o0_y,current_ingredient);
+        fix(&des_x,&des_y,o0_x,o0_y);
         if(!in(des_x,des_y,Players[0].x,Players[0].y)){
             player0_Action=movement(des_x,des_y,0);//移动操作
         }
@@ -155,20 +181,13 @@ int main()
     else if(status==1){//取盘子
         bool find_plate=0;
         if(plate_x==-1){
-            for(int i=0;i<entityCount;i++){
-                if(Entity[i].containerKind==ContainerKind::Plate){
-                    plate_x=Entity[i].x;
-                    plate_y=Entity[i].y;
-                    find_plate=1;
-                    break;
-                }
-            }
-            if(!find_plate){
+            if(!exist_plate(&plate_x,&plate_y,ContainerKind::Plate)){
                 fix(&des_x,&des_y,clean_plate_x,clean_plate_y);
                 if(!in(des_x,des_y,Players[0].x,Players[0].y)){
                     player0_Action=movement(des_x,des_y,0);//提前移动到干净盘子的地方//优化后比没优化还低？
                 }
             }
+            else find_plate=1;
         }
         else find_plate=1;
         fix(&des_x,&des_y,plate_x,plate_y);
@@ -179,7 +198,7 @@ int main()
             else {
                 player0_Action=inte(plate_x,plate_y,1);
                 count1++;
-                if(count1==Order[0].recipe.size())status=2;//已经完成菜谱，去拿盘子和食材 
+                if(count1==Order[0].recipe.size())status=2;//已经完成菜谱，拿起做好的食材 
             }
         }
     }
@@ -198,7 +217,6 @@ int main()
             player0_Action=inte(windows_x,windows_y,1);
             finished=1;
             status=0; 
-            count1=0;
         }
     }
 
@@ -218,11 +236,14 @@ int main()
     else{
         if(washing){
             player1_Action=inte(sink_x,sink_y,2);
+            if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
+                    //player1_Action=movement(des1_x,des1_y,1);//移动操作
+                }//防止被撞偏移
             int check=0;
             for(int i=0;i<entityCount;i++){
-                if (Entity[i].containerKind == ContainerKind::DirtyPlates)
+                if (Entity[i].containerKind==ContainerKind::DirtyPlates)
                     {   
-                        if(Entity[i].x==sink_x&&Entity[i].y==sink_y)
+                        if(Entity[i].x==sink_x&&Entity[i].y==sink_y)//在洗碗池里，没洗完
                             {
                                 check = 1;
                                 break;
@@ -232,17 +253,8 @@ int main()
             if(!check)washing=0;
         }
         else{
-            int check=0;
-            for(int i=0;i<entityCount;i++){
-                if (Entity[i].containerKind == ContainerKind::DirtyPlates)
-                    {   
-                        o1_x=Entity[i].x;
-                        o1_y=Entity[i].y;
-                        fix(&des1_x,&des1_y,Entity[i].x,Entity[i].y);
-                        check=1;
-                        break;
-                }
-            }
+            int check=exist_plate(&o1_x,&o1_y,ContainerKind::DirtyPlates);
+            fix(&des1_x,&des1_y,o1_x,o1_y);
             if(!check){
                 fix(&des1_x,&des1_y,dirty_plate_x,dirty_plate_y);
                 if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
@@ -260,6 +272,14 @@ int main()
         }
     }
 
+    if(dis()){
+        if(action(player0_Action)){
+            //player0_Action=random_walk();
+            player0_Action="Move RD";
+            //按照地图选取策略，防止卡死可以小概率随机，大概率选取固定策略
+            //卡死时启用随机游走，否则按照默认运行
+        }
+    }
         /* 输出当前帧的操作，此处仅作示例 */
         std::cout << "Frame " << i << "\n";
 
