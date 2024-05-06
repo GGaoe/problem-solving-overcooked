@@ -66,9 +66,20 @@ std::string random_walk(){
     else return "Move R";
     }
 
-bool exist_plate(double *x_1,double *y_1,ContainerKind cont,std::string s){
+bool exist_plate(double *x_1,double *y_1,ContainerKind cont){
     for(int i=0;i<entityCount;i++){
-                if(Entity[i].containerKind==cont || Entity[i].entity.back()==s){
+                if(Entity[i].containerKind==cont){
+                    *x_1=Entity[i].x;
+                    *y_1=Entity[i].y;
+                    return 1;
+                }
+    }
+    return 0;
+}
+
+bool exist_Entity(double *x_1,double *y_1,std::string s){
+    for(int i=0;i<entityCount;i++){
+                if(Entity[i].entity.back()==s){
                     *x_1=Entity[i].x;
                     *y_1=Entity[i].y;
                     return 1;
@@ -92,8 +103,8 @@ bool exist_Ingredient(double *x_1,double *y_1,std::string s){
 
 void init(){
     status=0;
-    exist_plate(&pot_x,&pot_y,ContainerKind::Pot,"Pot");
-    exist_plate(&pan_x,&pan_y,ContainerKind::Pan,"Pan");
+    exist_Entity(&pot_x,&pot_y,"Pot");
+    exist_Entity(&pan_x,&pan_y,"Pan");
     for(int i=0;i<height;i++){
         for(int j=0;j<width;j++){
             if(Map[i][j]=='$'){
@@ -280,7 +291,7 @@ int main()
     else if(status==1){//取盘子
         bool find_plate=0;
         if(plate_x==-1){
-            if(!exist_plate(&plate_x,&plate_y,ContainerKind::Plate,"Nome")){
+            if(!exist_plate(&plate_x,&plate_y,ContainerKind::Plate)){
                 fix(&des_x,&des_y,clean_plate_x,clean_plate_y);
                 if(!in(des_x,des_y,Players[0].x,Players[0].y)){
                     //player0_Action=movement(des_x,des_y,0);//提前移动到干净盘子的地方//优化后比没优化还低？
@@ -377,7 +388,7 @@ int main()
             if(!check)washing=0;
         }
         else{
-            int check=exist_plate(&o1_x,&o1_y,ContainerKind::DirtyPlates,"Nome");
+            int check=exist_plate(&o1_x,&o1_y,ContainerKind::DirtyPlates);
             fix(&des1_x,&des1_y,o1_x,o1_y);
             if(!check){
                 fix(&des1_x,&des1_y,dirty_plate_x,dirty_plate_y);
