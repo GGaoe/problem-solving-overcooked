@@ -6,7 +6,8 @@
 #include <framework.h>
 #include <move.h>
 #include <ctime>
-//#include <stdlib.h>
+#include <time.h>
+#include <stdlib.h>
 
 extern Player Players[2+5];//Player0负责做菜上菜，Player1负责拿脏盘子、洗盘子
 extern int width, height;
@@ -53,9 +54,8 @@ double dirty_plate_x=0;
 double dirty_plate_y=0;
 
 std::string random_walk(){
-    //srand((unsigned)time(0));
-    //int ran_num=rand()%4;
-    int ran_num=0;
+    srand((unsigned)time(0));
+    int ran_num=rand()%4;
     if(ran_num==0)return "Move U";
     else if(ran_num==1)return "Move D";
     else if (ran_num==2)return "Move L";
@@ -184,7 +184,7 @@ int main()
             if(!exist_plate(&plate_x,&plate_y,ContainerKind::Plate)){
                 fix(&des_x,&des_y,clean_plate_x,clean_plate_y);
                 if(!in(des_x,des_y,Players[0].x,Players[0].y)){
-                    player0_Action=movement(des_x,des_y,0);//提前移动到干净盘子的地方//优化后比没优化还低？
+                    //player0_Action=movement(des_x,des_y,0);//提前移动到干净盘子的地方//优化后比没优化还低？
                 }
             }
             else find_plate=1;
