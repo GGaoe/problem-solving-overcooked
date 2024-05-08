@@ -59,10 +59,14 @@ double dirty_plate_y=0;
 
 std::string random_walk(){
     srand((unsigned)time(0));
-    int ran_num=rand()%4;
+    int ran_num=rand()%8;
     if(ran_num==0)return "Move U";
     else if(ran_num==1)return "Move D";
     else if (ran_num==2)return "Move L";
+    else if (ran_num==3)return "Move UL";
+    else if (ran_num==4)return "Move LD";
+    else if (ran_num==5)return "Move RU";
+    else if (ran_num==6)return "Move RD";
     else return "Move R";
     }
 
@@ -372,7 +376,7 @@ int main()
         if(washing){
             player1_Action=inte(sink_x,sink_y,2);
             if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
-                    //player1_Action=movement(des1_x,des1_y,1);//移动操作
+                    player1_Action=movement(des1_x,des1_y,1);//移动操作
                 }//防止被撞偏移
             int check=0;
             for(int i=0;i<entityCount;i++){
@@ -393,7 +397,7 @@ int main()
             if(!check){
                 fix(&des1_x,&des1_y,dirty_plate_x,dirty_plate_y);
                 if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
-                    //player1_Action=movement(des1_x,des1_y,1);//移动操作
+                    player1_Action=movement(des1_x,des1_y,1);//移动操作
                 }
             }
             else{
