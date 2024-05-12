@@ -25,8 +25,10 @@ extern int status;
 //double error_u=0.96;//NUM=1,2226 points //NUM=2,2747
 //double error_d=0.05;//允许的误差范围
 //double error_u=0.989;//NUM=3,2681 points
+//double error_d=0.2;//允许的误差范围
+//double error_u=0.8;//NUM=4,2103
 double error_d=0.2;//允许的误差范围
-double error_u=0.8;//NUM=4,2103
+double error_u=0.954;//NUM=4,2103
 
 bool dis(){
     double x1=Players[0].x;
