@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <stack>
 
-//target: 补充多菜品，补充防掉陷阱
+//target: 修改策略，player1也要帮忙做菜。
 
 extern Player Players[2+5];//Player0负责做菜上菜，Player1负责拿脏盘子、洗盘子
 extern int width, height;
