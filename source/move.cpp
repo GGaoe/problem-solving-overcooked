@@ -25,7 +25,7 @@ extern int status;
 //double error_u=0.96;//NUM=1,2226 points //NUM=2,2747
 //double error_d=0.05;//允许的误差范围
 //double error_u=0.989;//NUM=3,2681 points
-double error_d=0.1;//允许的误差范围
+double error_d=0.2;//允许的误差范围
 double error_u=0.8;//NUM=4,2103
 
 bool dis(){
@@ -42,11 +42,12 @@ bool action(std::string s){
 }
 
 bool in(double x,double y,double d_x,double d_y){
-    if(d_x>=x+error_d && d_x<=x+error_u && d_y>=y+error_d && d_y<=y+error_u){
+    if(d_x>x+error_d && d_x<x+error_u && d_y>y+error_d && d_y<y+error_u){
         return 1;
     }
     return 0;
 }//检查是否抵达目的地
+
 
 std::string inte(double d_x, double d_y,  int op){
     if(d_x==0){
@@ -80,11 +81,9 @@ std::string inte(double d_x, double d_y,  int op){
             else if(op==2){
                 return "Interact D";
             }
-        }
-    else assert(0);  
+        } 
     return "Move";
 }
-
 
 std::string movement(double d_x,double d_y,int id){
     std::string ret = "Move ";
@@ -97,6 +96,7 @@ std::string movement(double d_x,double d_y,int id){
     if (Players[id].y > d_y+error_u)
         ret += "U";
     if(ret=="Move ")ret="Move";
-    //if(ret=="Move RU")ret="Move RUU";
+    if(Players[id].y>7 && Players[id].y<8 && Players[id].x>7.8 && ret=="Move LD")ret="Move L";
+    if(Players[id].x>7 && Players[id].x<8 && Players[id].y>7.8 && ret=="Move RU")ret="Move U";
     return ret;
 }//移动策略

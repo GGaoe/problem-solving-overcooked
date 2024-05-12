@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <stack>
 
+//target: 补充多菜品，补充防掉陷阱
+
 extern Player Players[2+5];//Player0负责做菜上菜，Player1负责拿脏盘子、洗盘子
 extern int width, height;
 extern char Map[20 + 5][20 + 5];
@@ -56,6 +58,7 @@ double clean_plate_x=0;
 double clean_plate_y=0;
 double dirty_plate_x=0;
 double dirty_plate_y=0;
+
 
 std::string random_walk(){
     srand((unsigned)time(0));
@@ -148,6 +151,20 @@ void fix(double *x,double *y,double x1,double y1){
     return;
 }//修正目标地址
 
+void find_origin_food(int count){
+    current_ingredient=Order[0].recipe[count];
+        while(!exist_Ingredient(&o0_x,&o0_y,current_ingredient)){
+            for (int i = 0; i < recipeCount; i++)
+                {
+                    if(current_ingredient==Recipe[i].nameAfter){
+                        current_ingredient=Recipe[i].nameBefore;
+                        Op.push(Recipe[i].kind);
+                        O_ingredient.push(Recipe[i].nameAfter);
+                    }
+                }
+        }
+}
+
 int main()
 {
     std::ios::sync_with_stdio(false);
@@ -174,8 +191,6 @@ int main()
         if (skip) continue;
         std::string player0_Action="Move";
         std::string player1_Action = "Move";
-        std::cerr<<"status:"<<status<<std::endl;
-        //std::cerr<<"Pot:"<<pot_x<<" "<<pot_y<<std::endl;
 
 
     //行为策略
@@ -187,17 +202,7 @@ int main()
     if(finished){
         finished=0;
         count1=0;
-        current_ingredient=Order[0].recipe[0];
-        while(!exist_Ingredient(&o0_x,&o0_y,current_ingredient)){
-            for (int i = 0; i < recipeCount; i++)
-                {
-                    if(current_ingredient==Recipe[i].nameAfter){
-                        current_ingredient=Recipe[i].nameBefore;
-                        Op.push(Recipe[i].kind);
-                        O_ingredient.push(Recipe[i].nameAfter);
-                    }
-                }
-        }
+        find_origin_food(0);
         status=0;
         //找到了处理方法和每次处理后的食材，用数组模拟栈，转移到status=1，取食材，栈非空转移到4 对食材进行处理
     }
@@ -225,7 +230,8 @@ int main()
             }
             else{
                 player0_Action=inte(cut_x,cut_y,1);//放菜
-                status=5;
+                status=5;//如果是切，就转移到5继续切
+                Op.pop();
             }            
         }
         else if(Op.top()=="-pot->"){
@@ -237,7 +243,8 @@ int main()
             }
             else{
                 player0_Action=inte(pot_x,pot_y,1);//放菜
-                status=5;
+                status=5;//如果是煮饭操作，放下后就不需要管了，继续去找原材料；
+                Op.pop();
             }
         }
         else if(Op.top()=="-pan->"){
@@ -250,22 +257,18 @@ int main()
             else{
                 player0_Action=inte(pan_x,pan_y,1);//放菜
                 status=5;
+                Op.pop();
             }
         }
     }
     else if(status==5){
-        //player0_Action="Move";
         for (int i = 0; i < entityCount; i++)
             {
-                //std::cerr<<"o0_x:"<<o0_x<<" "<<o0_y<<std::endl;
                 if(o0_x==Entity[i].x && o0_y==Entity[i].y){
-                    //std::cerr<<"current"<<Entity[i].currentFrame<<" "<<Entity[i].totalFrame<<std::endl;
                     if((Entity[i].entity.front()==O_ingredient.top()&&Entity[i].totalFrame==0)||Entity[i].currentFrame>Entity[i].totalFrame){
-                    //if(Entity[i].entity.front()==O_ingredient.top()){
                         player0_Action=inte(Entity[i].x,Entity[i].y,1);//拿做好的菜
                         current_ingredient=O_ingredient.top();
                         O_ingredient.pop();
-                        Op.pop();
                         if(Op.empty()){
                             status=1;
                             //拿盘子
@@ -276,7 +279,6 @@ int main()
                     }
                     else{
                         player0_Action=inte(Entity[i].x,Entity[i].y,2);//做菜
-                        //player0_Action="Move";
                     }
                     
                 }
@@ -289,7 +291,13 @@ int main()
         else {
             fix(&des_x,&des_y,plate_x,plate_y);
             player0_Action=inte(o0_x,o0_y,1);
-            status=2;
+            if(count1==Order[0].recipe.size())status=2;//已经完成菜谱，拿起做好的食材
+            else{
+                find_origin_food(count1);
+                status=0;
+                exist_Ingredient(&o0_x,&o0_y,current_ingredient);
+                fix(&des_x,&des_y,o0_x,o0_y);
+            }
         }
     }//还锅
     else if(status==1){//取盘子
@@ -298,7 +306,7 @@ int main()
             if(!exist_plate(&plate_x,&plate_y,ContainerKind::Plate)){
                 fix(&des_x,&des_y,clean_plate_x,clean_plate_y);
                 if(!in(des_x,des_y,Players[0].x,Players[0].y)){
-                    //player0_Action=movement(des_x,des_y,0);//提前移动到干净盘子的地方//优化后比没优化还低？
+                    player0_Action=movement(des_x,des_y,0);//提前移动到干净盘子的地方//优化后比没优化还低？
                 }
             }
             else find_plate=1;
@@ -329,8 +337,10 @@ int main()
                 else{//手里空空如也
                     if(count1==Order[0].recipe.size())status=2;//已经完成菜谱，拿起做好的食材 
                     else{
-                        player0_Action="Move";
-                        //还有别的菜，继续找原材料。。。。。。待补充
+                        find_origin_food(count1);
+                        status=0;
+                        exist_Ingredient(&o0_x,&o0_y,current_ingredient);
+                        fix(&des_x,&des_y,o0_x,o0_y);
                     }
                 }
             }
@@ -376,8 +386,10 @@ int main()
         if(washing){
             player1_Action=inte(sink_x,sink_y,2);
             if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
-                    player1_Action=movement(des1_x,des1_y,1);//移动操作
-                }//防止被撞偏移
+                //player1_Action=movement(des1_x,des1_y,1);//移动操作
+                assert(0);
+            }
+            
             int check=0;
             for(int i=0;i<entityCount;i++){
                 if (Entity[i].containerKind==ContainerKind::DirtyPlates)
@@ -397,7 +409,7 @@ int main()
             if(!check){
                 fix(&des1_x,&des1_y,dirty_plate_x,dirty_plate_y);
                 if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
-                    player1_Action=movement(des1_x,des1_y,1);//移动操作
+                    //player1_Action=movement(des1_x,des1_y,1);//移动到洗碗池
                 }
             }
             else{
@@ -413,8 +425,8 @@ int main()
 
     if(dis()){
         if(action(player0_Action)){
-            player0_Action=random_walk();
-            //player0_Action="Move RD";
+            //player0_Action=random_walk();
+            player0_Action="Move RD";
             //按照地图选取策略，防止卡死可以小概率随机，大概率选取固定策略
             //卡死时启用随机游走，否则按照默认运行
         }
