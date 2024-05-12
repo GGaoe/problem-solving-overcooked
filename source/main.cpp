@@ -204,7 +204,7 @@ int main()
             if(!exist_plate(&plate_x,&plate_y,ContainerKind::Plate)){
                 fix(&des_x,&des_y,clean_plate_x,clean_plate_y);
                 if(!in(des_x,des_y,Players[0].x,Players[0].y)){
-                    player0_Action=movement(des_x,des_y,0);//提前移动到干净盘子的地方//优化后比没优化还低？
+                    //player0_Action=movement(des_x,des_y,0);//提前移动到干净盘子的地方//优化后比没优化还低？
                 }
             }
             else find_plate=1;
