@@ -191,7 +191,7 @@ int main()
         if (skip) continue;
         std::string player0_Action="Move";
         std::string player1_Action = "Move";
-
+        std::cerr<<"STATUS:"<<status<<std::endl;
 
     //行为策略
     //player0负责做菜及上菜
@@ -386,8 +386,7 @@ int main()
         if(washing){
             player1_Action=inte(sink_x,sink_y,2);
             if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
-                //player1_Action=movement(des1_x,des1_y,1);//移动操作
-                assert(0);
+                player1_Action=movement(des1_x,des1_y,1);//移动操作
             }
             
             int check=0;
@@ -409,7 +408,7 @@ int main()
             if(!check){
                 fix(&des1_x,&des1_y,dirty_plate_x,dirty_plate_y);
                 if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
-                    player1_Action=movement(des1_x,des1_y,1);//提前移动到洗碗池
+                    //player1_Action=movement(des1_x,des1_y,1);//提前移动到洗碗池
                 }
             }
             else{
