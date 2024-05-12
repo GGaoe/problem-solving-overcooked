@@ -204,7 +204,7 @@ int main()
             if(!exist_plate(&plate_x,&plate_y,ContainerKind::Plate)){
                 fix(&des_x,&des_y,clean_plate_x,clean_plate_y);
                 if(!in(des_x,des_y,Players[0].x,Players[0].y)){
-                    //player0_Action=movement(des_x,des_y,0);//提前移动到干净盘子的地方//优化后比没优化还低？
+                    player0_Action=movement(des_x,des_y,0);//提前移动到干净盘子的地方//优化后比没优化还低？
                 }
             }
             else find_plate=1;
@@ -322,15 +322,14 @@ int main()
 
     if(dis()){
         if(action(player0_Action)){
-            player0_Action=random_walk();
-            //player0_Action="Move RD";
+            //player0_Action=random_walk();
+            player0_Action="Move RD";
             //按照地图选取策略，防止卡死可以小概率随机，大概率选取固定策略
             //卡死时启用随机游走，否则按照默认运行
         }
     }
         /* 输出当前帧的操作，此处仅作示例 */
         std::cout << "Frame " << i << "\n";
-        player1_Action="Move";
         /* 合成一个字符串再输出，否则输出有可能会被打断 */
         std::string action = player0_Action + "\n" + player1_Action + "\n";
         std::cout << action;
