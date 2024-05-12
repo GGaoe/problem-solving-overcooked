@@ -424,9 +424,9 @@ int main()
 
     if(dis()){
         if(action(player0_Action)){
-            player0_Action=random_walk();
+            //player0_Action=random_walk();
             //player0_Action="Move RD";
-            //player0_Action="Move L";
+            player0_Action="Move U";
             //按照地图选取策略，防止卡死可以小概率随机，大概率选取固定策略
             //卡死时启用随机游走，否则按照默认运行
         }
