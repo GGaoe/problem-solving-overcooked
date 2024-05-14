@@ -84,6 +84,19 @@ bool exist_plate(double *x_1,double *y_1,ContainerKind cont){
     return 0;
 }
 
+bool exist_multi_plate(double *x_1,double *y_1,ContainerKind cont){
+    int count2=0;
+    for(int i=0;i<entityCount;i++){
+                if(Entity[i].containerKind==cont){
+                    *x_1=Entity[i].x;
+                    *y_1=Entity[i].y;
+                    count2++;
+                }
+    }
+    if(count2)return 1;
+    return 0;
+}
+
 bool exist_Entity(double *x_1,double *y_1,std::string s){
     for(int i=0;i<entityCount;i++){
                 if(Entity[i].entity.back()==s){
@@ -385,10 +398,12 @@ int main()
     else{
         if(washing){
             player1_Action=inte(sink_x,sink_y,2);
-            if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
-                player1_Action=movement(des1_x,des1_y,1);//移动操作
+            //if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
+            //    player1_Action=movement(des1_x,des1_y,1);//移动操作
+            //}
+            if(!hard_in(des1_x,des1_y,Players[1].x,Players[1].y)){
+                player1_Action=hard_movement(des1_x,des1_y,1);//移动操作
             }
-            
             int check=0;
             for(int i=0;i<entityCount;i++){
                 if (Entity[i].containerKind==ContainerKind::DirtyPlates)
@@ -403,7 +418,7 @@ int main()
             if(!check)washing=0;
         }
         else{
-            int check=exist_plate(&o1_x,&o1_y,ContainerKind::DirtyPlates);
+            int check=exist_multi_plate(&o1_x,&o1_y,ContainerKind::DirtyPlates);
             fix(&des1_x,&des1_y,o1_x,o1_y);
             if(!check){
                 fix(&des1_x,&des1_y,dirty_plate_x,dirty_plate_y);
@@ -425,7 +440,6 @@ int main()
     if(dis()){
         if(action(player0_Action)){
             player0_Action=random_walk();
-            //player0_Action="Move RD";
             //player0_Action="Move LD";
             //按照地图选取策略，防止卡死可以小概率随机，大概率选取固定策略
             //卡死时启用随机游走，否则按照默认运行
