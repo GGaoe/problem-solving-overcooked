@@ -198,8 +198,8 @@ std::string movement(double d_x,double d_y,int id){
     else if (Players[id].y > d_y+error_u)
         ret += "U";
     if(ret=="Move ")ret="Move";
-    if(Players[id].y>6 && Players[id].y<9 && Players[id].x>7 && (ret=="Move LD"||ret=="Move D"))ret="Move L";
-    if(Players[id].x>6 && Players[id].x<9 && Players[id].y>7 && (ret=="Move RU"||ret=="Move R"))ret="Move U";
+    if(Players[id].y>6.5 && Players[id].y<9 && Players[id].x>7.5 && (ret=="Move LD"||ret=="Move D"))ret="Move L";
+    if(Players[id].x>6.5 && Players[id].x<9 && Players[id].y>7.5 && (ret=="Move RU"||ret=="Move R"))ret="Move U";
     return ret;
 }//移动策略
 
