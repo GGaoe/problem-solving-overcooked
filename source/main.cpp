@@ -279,15 +279,20 @@ int main()
             {
                 if(o0_x==Entity[i].x && o0_y==Entity[i].y){
                     if((Entity[i].entity.front()==O_ingredient.top()&&Entity[i].totalFrame==0)||Entity[i].currentFrame>Entity[i].totalFrame){
-                        player0_Action=inte(Entity[i].x,Entity[i].y,1);//拿做好的菜
-                        current_ingredient=O_ingredient.top();
-                        O_ingredient.pop();
-                        if(Op.empty()){
-                            status=1;
-                            //拿盘子
+                        if(!in(des_x,des_y,Players[0].x,Players[0].y)){
+                            player0_Action=movement(des_x,des_y,0);
                         }
                         else{
-                            status=4;
+                            player0_Action=inte(Entity[i].x,Entity[i].y,1);//拿做好的菜
+                            current_ingredient=O_ingredient.top();
+                            O_ingredient.pop();
+                            if(Op.empty()){
+                                status=1;
+                                //拿盘子
+                            }
+                            else{
+                                status=4;
+                            }
                         }
                     }
                     else{
@@ -439,10 +444,14 @@ int main()
 
     if(dis()){
         if(action(player0_Action)){
-            //player0_Action=random_walk();
-            player0_Action="Move U";
+            player0_Action=random_walk();
+            //player0_Action="Move L";
             //按照地图选取策略，防止卡死可以小概率随机，大概率选取固定策略
             //卡死时启用随机游走，否则按照默认运行
+        }
+        else if(action(player1_Action)){
+            player1_Action=random_walk();
+            //player1_Action="Move L";
         }
     }
         /* 输出当前帧的操作，此处仅作示例 */

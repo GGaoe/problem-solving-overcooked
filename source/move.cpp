@@ -62,6 +62,10 @@ bool action(std::string s){
     return 0;
 }
 
+bool id_move(int id){
+    return (fabs(Players[id].X_Velocity)<=0.001&&fabs(Players[id].Y_Velocity)<=0.001);
+}
+
 void map_copy(){
     for(int i=0;i<height;i++){
         for(int j=0;j<width;j++){
@@ -175,12 +179,12 @@ std::string inte(double d_x, double d_y,  int op){
 }
 
 std::string movement(double d_x,double d_y,int id){
-    int x=(int)(Players[id].x);
-    int y=(int)(Players[id].y);
+    int x=(int)(Players[id].x-0.2);
+    int y=(int)(Players[id].y-0.2);
     int des_xx=lround(d_x);
     int des_yy=lround(d_y);
     //std::cerr<<Players[id].x<<" "<<Players[id].y<<std::endl;
-    if(des_xx!=x||des_yy!=y)bfs(x,y,&des_xx,&des_yy,id);
+    if(des_xx!=x||des_yy!=y){bfs(x,y,&des_xx,&des_yy,id);
     d_x=des_xx;
     d_y=des_yy;
     /*
@@ -201,19 +205,39 @@ std::string movement(double d_x,double d_y,int id){
     else if (Players[id].y > d_y+error_u)
         ret += "U";
     if(ret=="Move ")ret="Move";
-    if(Players[id].y>6.5 && Players[id].y<9 && Players[id].x>7.5 && (ret=="Move LD"||ret=="Move D"))ret="Move L";
-    if(Players[id].x>6.5 && Players[id].x<9 && Players[id].y>7.5 && (ret=="Move RU"||ret=="Move R"))ret="Move U";
-    if(id==0&&ret!=last_1){
-        last_1=ret;
+    //if(Players[id].y>6.7 && Players[id].y<9 && Players[id].x>6.5 && (ret=="Move LD"||ret=="Move D"))ret="Move L";
+    //if(Players[id].x>6.7 && Players[id].x<9 && Players[id].y>6.7 && (ret=="Move RU"||ret=="Move R"))ret="Move U";
+    if(id==0&&ret!=last_1&&!id_move(0)){
+        //last_1=ret;
         ret="Move";
-        std::cerr<<"Lable 1"<<std::endl;
+    }
+    else if(id==0&&ret!=last_1&&id_move(0)){
+        last_1=ret;
+        //ret="Move";
     }
     if(id==1&&ret!=last_2){
         last_2=ret;
         ret="Move";
-        std::cerr<<"Lable 1"<<std::endl;
+    }
+    else if(id==1&&ret!=last_2&&id_move(1)){
+        last_2=ret;
+        //ret="Move";
     }
     return ret;
+    }
+    else{
+        std::string ret = "Move ";
+    if (Players[id].x < d_x + error_d1)
+        ret += "R";
+    else if (Players[id].x > d_x+error_u1)
+        ret += "L";
+    if (Players[id].y < d_y + error_d1)
+        ret += "D";
+    else if (Players[id].y > d_y+error_u1)
+        ret += "U";
+    if(ret=="Move ")ret="Move";
+    return ret;
+    }
 }//移动策略
 
 
