@@ -45,6 +45,9 @@ double error_u=0.8;//NUM=4,2103
 int f_x[4]={0,1,0,-1};
 int f_y[4]={1,0,-1,0};
 
+std::string last_1="Move";
+std::string last_2="Move";
+
 
 bool dis(){
     double x1=Players[0].x;
@@ -200,6 +203,14 @@ std::string movement(double d_x,double d_y,int id){
     if(ret=="Move ")ret="Move";
     if(Players[id].y>6.5 && Players[id].y<9 && Players[id].x>7.5 && (ret=="Move LD"||ret=="Move D"))ret="Move L";
     if(Players[id].x>6.5 && Players[id].x<9 && Players[id].y>7.5 && (ret=="Move RU"||ret=="Move R"))ret="Move U";
+    if(id==0&&ret!=last_1){
+        last_1=ret;
+        ret="Move";
+    }
+    if(id==1&&ret!=last_2){
+        last_2=ret;
+        ret="Move";
+    }
     return ret;
 }//移动策略
 
