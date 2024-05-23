@@ -109,7 +109,7 @@ std::string bfs(int x,int y,int* dx,int* dy,int id){
         int f=father[*dy][*dx];
         while(tmp_x!=x||tmp_y!=y){
             f=father[tmp_y][tmp_x];
-            std::cerr<<tmp_y<<" "<<tmp_x<<"->";
+            //std::cerr<<tmp_y<<" "<<tmp_x<<"->";
             int f_1=f_x[father[tmp_y][tmp_x]];
             int f_2=f_y[father[tmp_y][tmp_x]];
             tmp_x-=f_1;
@@ -175,8 +175,8 @@ std::string inte(double d_x, double d_y,  int op){
 }
 
 std::string movement(double d_x,double d_y,int id){
-    int x=(int)Players[id].x;
-    int y=(int)Players[id].y;
+    int x=(int)(Players[id].x);
+    int y=(int)(Players[id].y);
     int des_xx=lround(d_x);
     int des_yy=lround(d_y);
     //std::cerr<<Players[id].x<<" "<<Players[id].y<<std::endl;
@@ -206,10 +206,12 @@ std::string movement(double d_x,double d_y,int id){
     if(id==0&&ret!=last_1){
         last_1=ret;
         ret="Move";
+        std::cerr<<"Lable 1"<<std::endl;
     }
     if(id==1&&ret!=last_2){
         last_2=ret;
         ret="Move";
+        std::cerr<<"Lable 1"<<std::endl;
     }
     return ret;
 }//移动策略
