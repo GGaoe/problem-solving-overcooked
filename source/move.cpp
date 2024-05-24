@@ -196,8 +196,8 @@ std::string movement(double d_x,double d_y,int id){
     else if (Players[id].y > d_y+error_u)
         ret += "U";
     if(ret=="Move ")ret="Move";
-    if(Players[id].y>6.7 && Players[id].y<9 && Players[id].x>6.5 && (ret=="Move LD"||ret=="Move D"))ret="Move L";
-    if(Players[id].x>6.7 && Players[id].x<9 && Players[id].y>6.7 && (ret=="Move RU"||ret=="Move R"))ret="Move U";
+    if(Players[id].y>6.7 && Players[id].y<9 && Players[id].x>8 && (ret=="Move LD"||ret=="Move D"))ret="Move L";
+    if(Players[id].x>6.5 && Players[id].x<9 && Players[id].y>8 && (ret=="Move RU"||ret=="Move R"))ret="Move U";
     if(id==0&&ret!=last_1&&!id_move(0)){
         //last_1=ret;
         // if(!hard_in(Players[0].x,Players[0].y,d_x,d_y)){

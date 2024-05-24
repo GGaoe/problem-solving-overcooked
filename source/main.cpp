@@ -59,6 +59,70 @@ double clean_plate_y=0;
 double dirty_plate_x=0;
 double dirty_plate_y=0;
 
+bool exist_Ingredient(double *x_1,double *y_1,std::string s){
+   for (int i = 0; i < IngredientCount; i++)
+            {
+                if (Ingredient[i].name == s)
+                {   
+                    *x_1=Ingredient[i].x;
+                    *y_1=Ingredient[i].y;
+                    return 1;
+                }
+            }
+    return 0;
+}
+
+std::vector<int>v_int;//任务调度顺序
+void work_rank(){
+    for(int i=0;i<Order[0].recipe.size();i++){//只煮-> 又切又煮 -> 只切或没有操作
+        std::string tmp=Order[0].recipe[i];
+        bool pot_pan=0;
+        bool cut=0;
+        while(!exist_Ingredient(&o0_x,&o0_y,tmp)){
+            for (int j = 0; j < recipeCount; j++)
+                {
+                    if(tmp==Recipe[j].nameAfter){
+                        tmp=Recipe[j].nameBefore;
+                        if(Recipe[j].kind=="-pot->"||Recipe[j].kind=="-pan->")pot_pan=1;
+                        else if(Recipe[j].kind=="-chop->")cut=1;
+                    }
+                }
+        }
+        if(pot_pan&&!cut)v_int.push_back(i);
+    }
+    for(int i=0;i<Order[0].recipe.size();i++){//只煮-> 又切又煮 -> 只切或没有操作
+        std::string tmp=Order[0].recipe[i];
+        bool pot_pan=0;
+        bool cut=0;
+        while(!exist_Ingredient(&o0_x,&o0_y,tmp)){
+            for (int j = 0; j < recipeCount; j++)
+                {
+                    if(tmp==Recipe[j].nameAfter){
+                        tmp=Recipe[j].nameBefore;
+                        if(Recipe[j].kind=="-pot->"||Recipe[j].kind=="-pan->")pot_pan=1;
+                        else if(Recipe[j].kind=="-chop->")cut=1;
+                    }
+                }
+        }
+        if(pot_pan&&cut)v_int.push_back(i);
+    }
+    for(int i=0;i<Order[0].recipe.size();i++){//只煮-> 又切又煮 -> 只切或没有操作
+        std::string tmp=Order[0].recipe[i];
+        bool pot_pan=0;
+        bool cut=0;
+        while(!exist_Ingredient(&o0_x,&o0_y,tmp)){
+            for (int j = 0; j < recipeCount; j++)
+                {
+                    if(tmp==Recipe[j].nameAfter){
+                        tmp=Recipe[j].nameBefore;
+                        if(Recipe[j].kind=="-pot->"||Recipe[j].kind=="-pan->")pot_pan=1;
+                        else if(Recipe[j].kind=="-chop->")cut=1;
+                    }
+                }
+        }
+        if(!pot_pan)v_int.push_back(i);
+    }
+}
 
 std::string random_walk(){
     srand((unsigned)time(0));
@@ -84,18 +148,6 @@ bool exist_plate(double *x_1,double *y_1,ContainerKind cont){
     return 0;
 }
 
-bool exist_multi_plate(double *x_1,double *y_1,ContainerKind cont){
-    int count2=0;
-    for(int i=0;i<entityCount;i++){
-                if(Entity[i].containerKind==cont){
-                    *x_1=Entity[i].x;
-                    *y_1=Entity[i].y;
-                    count2++;
-                }
-    }
-    if(count2)return 1;
-    return 0;
-}
 
 bool exist_Entity(double *x_1,double *y_1,std::string s){
     for(int i=0;i<entityCount;i++){
@@ -108,18 +160,6 @@ bool exist_Entity(double *x_1,double *y_1,std::string s){
     return 0;
 }
 
-bool exist_Ingredient(double *x_1,double *y_1,std::string s){
-   for (int i = 0; i < IngredientCount; i++)
-            {
-                if (Ingredient[i].name == s)
-                {   
-                    *x_1=Ingredient[i].x;
-                    *y_1=Ingredient[i].y;
-                    return 1;
-                }
-            }
-    return 0;
-}
 
 void init(){
     status=0;
@@ -165,7 +205,7 @@ void fix(double *x,double *y,double x1,double y1){
 }//修正目标地址
 
 void find_origin_food(int count){
-    current_ingredient=Order[0].recipe[count];
+    current_ingredient=Order[0].recipe[v_int[count]];
         while(!exist_Ingredient(&o0_x,&o0_y,current_ingredient)){
             for (int i = 0; i < recipeCount; i++)
                 {
@@ -215,6 +255,8 @@ int main()
     if(finished){
         finished=0;
         count1=0;
+        v_int.clear();
+        work_rank();
         find_origin_food(0);
         status=0;
         //找到了处理方法和每次处理后的食材，用数组模拟栈，转移到status=1，取食材，栈非空转移到4 对食材进行处理
@@ -423,7 +465,7 @@ int main()
             if(!check)washing=0;
         }
         else{
-            int check=exist_multi_plate(&o1_x,&o1_y,ContainerKind::DirtyPlates);
+            int check=exist_plate(&o1_x,&o1_y,ContainerKind::DirtyPlates);
             fix(&des1_x,&des1_y,o1_x,o1_y);
             if(!check){
                 fix(&des1_x,&des1_y,dirty_plate_x,dirty_plate_y);
@@ -445,7 +487,7 @@ int main()
     if(dis()){
         if(action(player0_Action)){
             player0_Action=random_walk();
-            //player0_Action="Move L";
+            //player0_Action="Move U";
             //按照地图选取策略，防止卡死可以小概率随机，大概率选取固定策略
             //卡死时启用随机游走，否则按照默认运行
         }
