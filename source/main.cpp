@@ -446,6 +446,7 @@ int main()
 
     //player1负责拿脏盘子以及洗盘子
     if(status_2==0){
+        //player1_Action=movement(5,8,1);//移动操作
         int check=exist_plate(&o1_x,&o1_y,ContainerKind::DirtyPlates);
         if(check){
             fix(&des1_x,&des1_y,o1_x,o1_y);

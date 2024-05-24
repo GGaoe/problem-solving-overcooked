@@ -204,7 +204,7 @@ std::string movement(double d_x,double d_y,int id){
         //     ret=hard_movement(d_x,d_y,0);
         // }
         // else 
-        ret="Move";
+        //ret="Move";
     }
     else if(id==0&&ret!=last_1&&id_move(0)){
         last_1=ret;
@@ -215,7 +215,7 @@ std::string movement(double d_x,double d_y,int id){
         //     ret=hard_movement(d_x,d_y,1);
         // }
         // else 
-        ret="Move";
+        //ret="Move";
     }
     else if(id==1&&ret!=last_2&&id_move(1)){
         last_2=ret;
