@@ -422,39 +422,27 @@ int main()
                         exist_Ingredient(&o0_x,&o0_y,current_ingredient);
                         fix(&des_x,&des_y,o0_x,o0_y);
                     }
-
-                //放下做好的东西到盘子里，如果手里拿着锅，去还锅
-                if(Players[0].containerKind==ContainerKind::Pan){
-                    o0_x=pan_x;
-                    o0_y=pan_y;
-                    fix(&des_x,&des_y,pan_x,pan_y);
-                    status=6;
-                }
-                else if(Players[0].containerKind==ContainerKind::Pot){
-                    o0_x=pot_x;
-                    o0_y=pot_y;
-                    fix(&des_x,&des_y,pot_x,pot_y);
-                    status=6;
-                }
-                else{//手里空空如也
-                    
-                }
             }
         }
     }
-    else if(status==2){//拿起做好的食材和盘子
-    // if(!in(des_x,des_y,Players[0].x,Players[0].y)){
-    //     player0_Action=movement(des_x,des_y,0);//移动操作
-    // }
-    // else{
-    //     player0_Action=inte(plate_x,plate_y,1);
-    //     plate_x=-1;
-    //     plate_y=-1;
-    //     status=3;
+     else if(status==2){//拿起做好的食材和盘子
+    // current_ingredient=Order[1].recipe[0];
+    //     while(!exist_Ingredient(&o0_x,&o0_y,current_ingredient)){
+    //         for (int i = 0; i < recipeCount; i++)
+    //             {
+    //                 if(current_ingredient==Recipe[i].nameAfter){
+    //                     current_ingredient=Recipe[i].nameBefore;
+    //                 }
+    //             }
     //     }
-    player0_Action=movement(3,1,0);
-    }
-
+    //     fix(&des_x,&des_y,o0_x,o0_y);
+    //     if(!in(des_x,des_y,Players[0].x,Players[0].y)){
+    //         player0_Action=movement(des_x,des_y,0);//移动操作
+    //     }
+    //     else player0_Action="Move";
+    // }
+        player0_Action=movement(3,3,0);//移动操作
+     }
 
     //player1负责拿脏盘子以及洗盘子
     if(status_2==0){
