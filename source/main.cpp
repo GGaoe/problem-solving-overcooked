@@ -441,7 +441,7 @@ int main()
     //     }
     //     else player0_Action="Move";
     // }
-        player0_Action=movement(3,3,0);//移动操作
+        player0_Action=movement(1,4,0);//移动操作
      }
 
     //player1负责拿脏盘子以及洗盘子
@@ -542,7 +542,14 @@ int main()
         }
     }
     else if(status_2==3){
-        bool find_plate=exist_plate(&plate_x,&plate_y,ContainerKind::Plate);
+        bool find_plate=0;
+        if(plate_x==-1){
+            if(!exist_plate(&plate_x,&plate_y,ContainerKind::Plate)){
+                fix(&des1_x,&des1_y,clean_plate_x,clean_plate_y);
+            }
+            else find_plate=1;
+        }
+        else find_plate=1;
         fix(&des1_x,&des1_y,plate_x,plate_y);
         if(find_plate){
             if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
