@@ -26,6 +26,7 @@ extern struct Order Order[20 + 5];
 extern int entityCount;
 extern struct Entity Entity[20 + 5];
 extern int status;//0：取原料 1：找盘子 2：拿盘子和食材 3：去上菜 4：找工作台放菜 5：做菜 6：拿菜 7：还锅
+int status_2=0;//Player2的状态
 
 double windows_x;//交菜窗口
 double windows_y;
@@ -58,6 +59,9 @@ double clean_plate_x=0;
 double clean_plate_y=0;
 double dirty_plate_x=0;
 double dirty_plate_y=0;
+int in_plate_count=0;
+double entity_x=0;
+double entity_y=0;
 
 bool exist_Ingredient(double *x_1,double *y_1,std::string s){
    for (int i = 0; i < IngredientCount; i++)
@@ -163,6 +167,7 @@ bool exist_Entity(double *x_1,double *y_1,std::string s){
 
 void init(){
     status=0;
+    status_2=0;
     exist_Entity(&pot_x,&pot_y,"Pot");
     exist_Entity(&pan_x,&pan_y,"Pan");
     for(int i=0;i<height;i++){
@@ -254,6 +259,7 @@ int main()
     //拿盘子
     if(finished){
         finished=0;
+        in_plate_count=0;
         count1=0;
         v_int.clear();
         work_rank();
@@ -293,26 +299,68 @@ int main()
             o0_x=pot_x;
             o0_y=pot_y;
             fix(&des_x,&des_y,pot_x,pot_y);
-            if(!in(des_x,des_y,Players[0].x,Players[0].y)){
-                    player0_Action=movement(des_x,des_y,0);
-            }
-            else{
-                player0_Action=inte(pot_x,pot_y,1);//放菜
-                status=5;//如果是煮饭操作，放下后就不需要管了，继续去找原材料；
-                Op.pop();
+            bool exist_pot=0;
+            for (int i = 0; i < entityCount; i++)
+                {
+                    if(o0_x==Entity[i].x && o0_y==Entity[i].y){
+                        if(Entity[i].currentFrame!=0||Entity[i].totalFrame!=0){
+                            player0_Action="Move";
+                            exist_pot=1;
+                            break;
+                        }
+                    }
+                }
+            if(!exist_pot){
+                if(!in(des_x,des_y,Players[0].x,Players[0].y)){
+                        player0_Action=movement(des_x,des_y,0);
+                }
+                else{
+                    player0_Action=inte(pot_x,pot_y,1);//放菜
+                    count1++;
+                    O_ingredient.pop();
+                    Op.pop();
+                    if(count1==Order[0].recipe.size())status=2;//已经完成菜谱，拿起做好的食材
+                    else{
+                        find_origin_food(count1);
+                        status=0;
+                        exist_Ingredient(&o0_x,&o0_y,current_ingredient);
+                        fix(&des_x,&des_y,o0_x,o0_y);
+                    }
+                }
             }
         }
         else if(Op.top()=="-pan->"){
             o0_x=pan_x;
             o0_y=pan_y;
             fix(&des_x,&des_y,pan_x,pan_y);
-            if(!in(des_x,des_y,Players[0].x,Players[0].y)){
-                    player0_Action=movement(des_x,des_y,0);
-            }
-            else{
-                player0_Action=inte(pan_x,pan_y,1);//放菜
-                status=5;
-                Op.pop();
+            bool exist_pot=0;
+            for (int i = 0; i < entityCount; i++)
+                {
+                    if(o0_x==Entity[i].x && o0_y==Entity[i].y){
+                        if(Entity[i].currentFrame!=0||Entity[i].totalFrame!=0){
+                            player0_Action="Move";
+                            exist_pot=1;
+                            break;
+                        }
+                    }
+                }
+            if(!exist_pot){
+                if(!in(des_x,des_y,Players[0].x,Players[0].y)){
+                        player0_Action=movement(des_x,des_y,0);
+                }
+                else{
+                    player0_Action=inte(pan_x,pan_y,1);//放菜
+                    count1++;
+                    O_ingredient.pop();
+                    Op.pop();
+                    if(count1==Order[0].recipe.size())status=2;//已经完成菜谱，拿起做好的食材
+                    else{
+                        find_origin_food(count1);
+                        status=0;
+                        exist_Ingredient(&o0_x,&o0_y,current_ingredient);
+                        fix(&des_x,&des_y,o0_x,o0_y);
+                    }
+                }
             }
         }
     }
@@ -320,7 +368,7 @@ int main()
         for (int i = 0; i < entityCount; i++)
             {
                 if(o0_x==Entity[i].x && o0_y==Entity[i].y){
-                    if((Entity[i].entity.front()==O_ingredient.top()&&Entity[i].totalFrame==0)||Entity[i].currentFrame>Entity[i].totalFrame){
+                    if((Entity[i].entity.front()==O_ingredient.top()&&Entity[i].totalFrame==0)){
                         if(!in(des_x,des_y,Players[0].x,Players[0].y)){
                             player0_Action=movement(des_x,des_y,0);
                         }
@@ -344,22 +392,6 @@ int main()
                 }
             }
     }//做菜
-    else if(status==6){
-        if(!in(des_x,des_y,Players[0].x,Players[0].y)){
-                player0_Action=movement(des_x,des_y,0);//移动操作
-            }
-        else {
-            fix(&des_x,&des_y,plate_x,plate_y);
-            player0_Action=inte(o0_x,o0_y,1);
-            if(count1==Order[0].recipe.size())status=2;//已经完成菜谱，拿起做好的食材
-            else{
-                find_origin_food(count1);
-                status=0;
-                exist_Ingredient(&o0_x,&o0_y,current_ingredient);
-                fix(&des_x,&des_y,o0_x,o0_y);
-            }
-        }
-    }//还锅
     else if(status==1){//取盘子
         bool find_plate=0;
         if(plate_x==-1){
@@ -380,7 +412,17 @@ int main()
             else {
                 player0_Action=inte(plate_x,plate_y,1);
                 count1++;
-                
+                in_plate_count++;
+                if(count1==Order[0].recipe.size()){
+                    status=2;//已经完成菜谱，找个凉快地方蹲着 *******
+                }
+                    else{
+                        find_origin_food(count1);
+                        status=0;
+                        exist_Ingredient(&o0_x,&o0_y,current_ingredient);
+                        fix(&des_x,&des_y,o0_x,o0_y);
+                    }
+
                 //放下做好的东西到盘子里，如果手里拿着锅，去还锅
                 if(Players[0].containerKind==ContainerKind::Pan){
                     o0_x=pan_x;
@@ -395,82 +437,101 @@ int main()
                     status=6;
                 }
                 else{//手里空空如也
-                    if(count1==Order[0].recipe.size())status=2;//已经完成菜谱，拿起做好的食材 
-                    else{
-                        find_origin_food(count1);
-                        status=0;
-                        exist_Ingredient(&o0_x,&o0_y,current_ingredient);
-                        fix(&des_x,&des_y,o0_x,o0_y);
-                    }
+                    
                 }
             }
         }
     }
     else if(status==2){//拿起做好的食材和盘子
-    if(!in(des_x,des_y,Players[0].x,Players[0].y)){
-        player0_Action=movement(des_x,des_y,0);//移动操作
+    // if(!in(des_x,des_y,Players[0].x,Players[0].y)){
+    //     player0_Action=movement(des_x,des_y,0);//移动操作
+    // }
+    // else{
+    //     player0_Action=inte(plate_x,plate_y,1);
+    //     plate_x=-1;
+    //     plate_y=-1;
+    //     status=3;
+    //     }
+    player0_Action=movement(3,1,0);
     }
-    else{
-        player0_Action=inte(plate_x,plate_y,1);
-        plate_x=-1;
-        plate_y=-1;
-        status=3;
-        }
-    }
-    else if(status==3){//送菜
-        fix(&des_x,&des_y,windows_x,windows_y);
-        if(!in(des_x,des_y,Players[0].x,Players[0].y)){
-                player0_Action=movement(des_x,des_y,0);//移动操作
-            }
-        else {
-            player0_Action=inte(windows_x,windows_y,1);
-            finished=1;
-            status=0; 
-        }
-    }
-
 
 
     //player1负责拿脏盘子以及洗盘子
-    if(Players[1].containerKind==ContainerKind::DirtyPlates){//player1拿着脏盘子去洗碗池
-        fix(&des1_x,&des1_y,sink_x,sink_y);
-        if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
-            player1_Action=movement(des1_x,des1_y,1);//移动操作
+    if(status_2==0){
+        int check=exist_plate(&o1_x,&o1_y,ContainerKind::DirtyPlates);
+        if(check){
+            fix(&des1_x,&des1_y,o1_x,o1_y);
+            if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
+                player1_Action=movement(des1_x,des1_y,1);//移动操作
+                status_2=1;
+            }
+        }
+        else if(in_plate_count==Order[0].recipe.size()){
+            fix(&des1_x,&des1_y,plate_x,plate_y);
+            if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
+                player1_Action=movement(des1_x,des1_y,1);//移动操作
+            }
+            else{
+                player1_Action="Move";
+                status_2=5;
+            }
+
         }
         else{
-            player1_Action=inte(sink_x,sink_y,1);
-            washing=1;
+            bool exist_pot=0;
+            for (int i = 0; i < entityCount; i++)
+                {
+                    if(Entity[i].currentFrame>Entity[i].totalFrame){
+                        fix(&des1_x,&des1_y,Entity[i].x,Entity[i].y);
+                        entity_x=Entity[i].x;
+                        entity_y=Entity[i].y;
+                        exist_pot=1;
+                        break;
+                    }
+                }
+            if(exist_pot){
+                if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
+                    player1_Action=movement(des1_x,des1_y,1);//移动操作
+                    status_2=2;
+                }
+            }
+
         }
     }
-    else{
-        if(washing){
-            player1_Action=inte(sink_x,sink_y,2);
-            //if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
-            //    player1_Action=movement(des1_x,des1_y,1);//移动操作
-            //}
-            if(!hard_in(des1_x,des1_y,Players[1].x,Players[1].y)){
-                player1_Action=hard_movement(des1_x,des1_y,1);//移动操作
+    else if(status_2==1){
+        if(Players[1].containerKind==ContainerKind::DirtyPlates){//player1拿着脏盘子去洗碗池
+            fix(&des1_x,&des1_y,sink_x,sink_y);
+            if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
+                player1_Action=movement(des1_x,des1_y,1);//移动操作
             }
-            int check=0;
-            for(int i=0;i<entityCount;i++){
-                if (Entity[i].containerKind==ContainerKind::DirtyPlates)
-                    {   
-                        if(Entity[i].x==sink_x&&Entity[i].y==sink_y)//在洗碗池里，没洗完
-                            {
-                                check = 1;
-                                break;
-                            }
-                    }
+            else{
+                player1_Action=inte(sink_x,sink_y,1);
+                washing=1;
             }
-            if(!check)washing=0;
         }
         else{
-            int check=exist_plate(&o1_x,&o1_y,ContainerKind::DirtyPlates);
-            fix(&des1_x,&des1_y,o1_x,o1_y);
-            if(!check){
-                fix(&des1_x,&des1_y,dirty_plate_x,dirty_plate_y);
+            if(washing){
+                player1_Action=inte(sink_x,sink_y,2);
                 if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
-                    player1_Action=movement(des1_x,des1_y,1);//提前移动到洗碗池
+                    player1_Action=movement(des1_x,des1_y,1);//移动操作
+                }
+                if(!hard_in(des1_x,des1_y,Players[1].x,Players[1].y)){
+                    player1_Action=hard_movement(des1_x,des1_y,1);//移动操作
+                }
+                int check=0;
+                for(int i=0;i<entityCount;i++){
+                    if (Entity[i].containerKind==ContainerKind::DirtyPlates)
+                        {   
+                            if(Entity[i].x==sink_x&&Entity[i].y==sink_y)//在洗碗池里，没洗完
+                                {
+                                    check = 1;
+                                    break;
+                                }
+                        }
+                }
+                if(!check){
+                    washing=0;
+                    status_2=0;
                 }
             }
             else{
@@ -483,6 +544,79 @@ int main()
             }
         }
     }
+    else if(status_2==2){   
+        if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
+            player1_Action=movement(des1_x,des1_y,1);//移动操作
+        }
+        else{
+            player1_Action=inte(entity_x,entity_y,1);
+            status_2=3;
+        }
+    }
+    else if(status_2==3){
+        bool find_plate=exist_plate(&plate_x,&plate_y,ContainerKind::Plate);
+        fix(&des1_x,&des1_y,plate_x,plate_y);
+        if(find_plate){
+            if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
+                player1_Action=movement(des1_x,des1_y,1);//移动操作
+            }
+            else {
+                player1_Action=inte(plate_x,plate_y,1);
+                in_plate_count++;
+                status_2=4;
+                // if(count1==Order[0].recipe.size()){
+                //     status=2;//已经完成菜谱，找个凉快地方蹲着 *******
+                // }
+                //放下做好的东西到盘子里，如果手里拿着锅，去还锅
+                if(Players[1].containerKind==ContainerKind::Pan){
+                    o1_x=pan_x;
+                    o1_y=pan_y;
+                    fix(&des1_x,&des1_y,pan_x,pan_y);
+                }
+                else if(Players[1].containerKind==ContainerKind::Pot){
+                    o1_x=pot_x;
+                    o1_y=pot_y;
+                    fix(&des1_x,&des1_y,pot_x,pot_y);
+                }
+            }
+        }
+    }
+    else if(status_2==4){
+        if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
+                player1_Action=movement(des1_x,des1_y,1);//移动操作
+            }
+        else {
+            fix(&des1_x,&des1_y,plate_x,plate_y);
+            player1_Action=inte(o1_x,o1_y,1);
+            if(in_plate_count==Order[0].recipe.size())status_2=5;//已经完成菜谱，拿起做好的食材
+            else{
+                status_2=0;
+            }
+        }
+    }
+    else if(status_2==5){
+        if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
+            player1_Action=movement(des1_x,des1_y,1);//移动操作
+        }
+        else{
+            player1_Action=inte(plate_x,plate_y,1);
+            plate_x=-1;
+            plate_y=-1;
+            status_2=6;
+            }
+    }
+    else if(status_2==6){
+        fix(&des1_x,&des1_y,windows_x,windows_y);
+        if(!in(des1_x,des1_y,Players[1].x,Players[1].y)){
+                player1_Action=movement(des1_x,des1_y,1);//移动操作
+            }
+        else {
+            player1_Action=inte(windows_x,windows_y,1);
+            finished=1;
+            status_2=0; 
+        }
+    }
+
 
     if(dis()){
         if(action(player0_Action)){
