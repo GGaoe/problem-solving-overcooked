@@ -120,7 +120,6 @@ std::string bfs(int x,int y,int* dx,int* dy,int id){
             tmp_y-=f_2;
         }
         //fix ther destination
-        std::cerr<<"fix"<<x<<" "<<y<<" "<<x+f_x[f]<<" "<<y+f_y[f]<<std::endl;
         *dx=x+f_x[f];
         *dy=y+f_y[f];
     }
@@ -183,17 +182,9 @@ std::string movement(double d_x,double d_y,int id){
     int y=(int)(Players[id].y-0.2);
     int des_xx=lround(d_x);
     int des_yy=lround(d_y);
-    //std::cerr<<Players[id].x<<" "<<Players[id].y<<std::endl;
     if(des_xx!=x||des_yy!=y){bfs(x,y,&des_xx,&des_yy,id);
     d_x=des_xx;
     d_y=des_yy;
-    /*
-     for(int i=0;i<height;i++){
-        for(int j=0;j<width;j++){
-        std::cerr<<bfs_map[i][j];
-        }
-        std::cerr<<std::endl;
-    }*/
 
     std::string ret = "Move ";
     if (Players[id].x < d_x + error_d)
@@ -205,18 +196,25 @@ std::string movement(double d_x,double d_y,int id){
     else if (Players[id].y > d_y+error_u)
         ret += "U";
     if(ret=="Move ")ret="Move";
-    //if(Players[id].y>6.7 && Players[id].y<9 && Players[id].x>6.5 && (ret=="Move LD"||ret=="Move D"))ret="Move L";
-    //if(Players[id].x>6.7 && Players[id].x<9 && Players[id].y>6.7 && (ret=="Move RU"||ret=="Move R"))ret="Move U";
+    if(Players[id].y>6.7 && Players[id].y<9 && Players[id].x>6.5 && (ret=="Move LD"||ret=="Move D"))ret="Move L";
+    if(Players[id].x>6.7 && Players[id].x<9 && Players[id].y>6.7 && (ret=="Move RU"||ret=="Move R"))ret="Move U";
     if(id==0&&ret!=last_1&&!id_move(0)){
         //last_1=ret;
+        // if(!hard_in(Players[0].x,Players[0].y,d_x,d_y)){
+        //     ret=hard_movement(d_x,d_y,0);
+        // }
+        // else 
         ret="Move";
     }
     else if(id==0&&ret!=last_1&&id_move(0)){
         last_1=ret;
         //ret="Move";
     }
-    if(id==1&&ret!=last_2){
-        last_2=ret;
+    if(id==1&&ret!=last_2&&!id_move(1)){
+        // if(!hard_in(Players[1].x,Players[1].y,d_x,d_y)){
+        //     ret=hard_movement(d_x,d_y,1);
+        // }
+        // else 
         ret="Move";
     }
     else if(id==1&&ret!=last_2&&id_move(1)){
