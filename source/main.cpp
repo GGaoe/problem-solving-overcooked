@@ -441,7 +441,8 @@ int main()
     //     }
     //     else player0_Action="Move";
     // }
-        player0_Action=movement(3,3,0);//移动操作
+        //player0_Action=movement(3,3,0);//移动操作
+        player0_Action="Move";//移动操作
      }
 
     //player1负责拿脏盘子以及洗盘子
