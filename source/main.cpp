@@ -441,7 +441,7 @@ int main()
     //     }
     //     else player0_Action="Move";
     // }
-        player0_Action=movement(3,3,0);//移动操作
+        player0_Action=movement(1,6,0);//移动操作
         //player0_Action="Move";//移动操作
      }
 
