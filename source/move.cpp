@@ -199,23 +199,24 @@ std::string movement(double d_x,double d_y,int id){
     if(Players[id].y>6.7 && Players[id].y<9 && Players[id].x>8 && (ret=="Move LD"||ret=="Move D"))ret="Move L";
     if(Players[id].x>6.5 && Players[id].x<9 && Players[id].y>8 && (ret=="Move RU"||ret=="Move R"))ret="Move U";
     if(id==0&&ret!=last_1&&!id_move(0)){
-        //last_1=ret;
+        last_1=ret;
         // if(!hard_in(Players[0].x,Players[0].y,d_x,d_y)){
         //     ret=hard_movement(d_x,d_y,0);
         // }
         // else 
-        ret="Move";
+        //ret="Move";
     }
     else if(id==0&&ret!=last_1&&id_move(0)){
         last_1=ret;
         //ret="Move";
     }
     if(id==1&&ret!=last_2&&!id_move(1)){
+        last_2=ret;
         // if(!hard_in(Players[1].x,Players[1].y,d_x,d_y)){
         //     ret=hard_movement(d_x,d_y,1);
         // }
         // else 
-        ret="Move";
+        //ret="Move";
     }
     else if(id==1&&ret!=last_2&&id_move(1)){
         last_2=ret;
